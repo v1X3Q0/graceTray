@@ -38,6 +38,7 @@ The scenario that I want to emphasize is that even in the case that the correct 
 
 To start, calling args for our trace are the module beginning, module end and the destination of the trace. These are presented to the python file gdbTrace.py in a local text file named args.txt. With info proc mappings output looking like so:
 
+```
 (gdb) info proc mappings
 process 11850
 Mapped address spaces:
@@ -60,9 +61,10 @@ Mapped address spaces:
       0x7ffff7ffe000     0x7ffff7fff000     0x1000        0x0 
       0x7ffffffde000     0x7ffffffff000    0x21000        0x0 [stack]
   0xffffffffff600000 0xffffffffff601000     0x1000        0x0 [vsyscall]
+```
 
 Our module beginning is address 0x555555554000 while our end can be 0x555555756000. To be honest the tracing goes uses finish when it breaks out of the target range, so that range can be a routine instead of a module, but for tracing some of the recursion we will keep it as so. With a main disassembly displayed as:
-
+```
 (gdb) disas main
 Dump of assembler code for function main:
    0x00005555555546da <+0>:	push   rbp
@@ -129,6 +131,7 @@ Dump of assembler code for function main:
    0x00005555555547a7 <+205>:	mov    eax,0x0
    0x00005555555547ac <+210>:	leave  
    0x00005555555547ad <+211>:	ret    
+```
 
 We want to break somewhere towards the beginning of the main, and the third argument of the args.txt should be 0x00005555555547ad, the return statement.
 
