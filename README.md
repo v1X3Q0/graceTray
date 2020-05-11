@@ -133,7 +133,9 @@ Dump of assembler code for function main:
    0x00005555555547ad <+211>:	ret    
 ```
 
-We want to break somewhere towards the beginning of the main, and the third argument of the args.txt should be 0x00005555555547ad, the return statement.
+We want to break somewhere towards the beginning of the main, and the third argument of the args.txt should be 0x00005555555547ad, the return statement. We can then run our script with source gdbTrace.py.
+
+Lastly we run the file genSetColorTrace.py with inputs for our functions beginning, end and the input file generated gdbTrace.txt. The file gdbTrace.txt.py can then be used for our idb.
 
 running this twice with input kol and mol shows:
 ![windbgScreen](https://github.com/v1X3Q0/graceTray/blob/master/images/correct.png)
