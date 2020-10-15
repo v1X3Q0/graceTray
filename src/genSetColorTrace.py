@@ -50,7 +50,7 @@ def main():
         curColor = startColor + (int(colorIncrCount) << ((count % 3) * 8))
         if count == len(traceList) - 1:
             curColor = 0
-        f.write('SetColor(' + hex(i) +  ', CIC_ITEM, ' + hex(curColor) + ')\n')
+        f.write('set_color(' + hex(i) +  ', CIC_ITEM, ' + hex(curColor) + ')\n')
         colorIncrCount += colorIncr
         count += 1
 
