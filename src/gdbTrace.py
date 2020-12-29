@@ -1,8 +1,15 @@
 import sys
+import argparse
 
-modBegin = 0
-modEnd = 0
-destination = 0
+parser = argparse.ArgumentParser(description='trace some stuff.')
+parser.add_argument('-mb', '--modBegin', default=0, type=int,
+                    help='module beginning')
+parser.add_argument('-me', '--modEnd', default=0, type=int,
+                    help='module ending')
+parser.add_argument('-dst', '--destination', type=int, required=True,
+                    help='destination instruction')
+parser.add_argument('-nt', '--noTrace', action='store_true',
+                    help='whether or not to record instructions')
 #winload
 #   modBegin = 0x4057B000
 #   modEnd = 0x4068C8C8
@@ -15,36 +22,39 @@ def parseArgFile():
     i = h.split(' ')
     while len(sys.argv) != 1:
         sys.argv.pop()
+    if sys.argv[0] == '':
+        sys.argv.pop()
+        sys.argv.append(__file__)
     for j in i:
         sys.argv.append(j)
     return i
 
-def main():
+def main(args):
     # gdb.execute("set logging redirect on")
     # gdb.execute("set logging overwrite on")
     # gdb.execute("set logging file gdbTrace.txt")
     # gdb.execute("set logging on")
-    f = open("gdbTrace.txt", "w")
+    if args.noTrace != True:
+        f = open("gdbTrace.txt", "w")
     while True:
         currentInst = gdb.parse_and_eval("$pc")
-        f.write(hex(currentInst) + '\n')
-        if currentInst == destination:
+        if args.noTrace != True:
+            f.write(hex(currentInst) + '\n')
+
+        if currentInst == args.destination:
             break
-        elif (currentInst < modBegin) or (currentInst > modEnd):
-            gdb.execute("finish")
-            continue
+        # elif (currentInst < args.modBegin) or (currentInst > args.modEnd):
+        #     gdb.execute("finish")
+        #     continue
         gdb.execute("si")
     # gdb.execute("set logging off")
-    f.close()
+    if args.noTrace != True:
+        f.close()
     
 if __name__ == "__main__":
-    args = parseArgFile()
-    if (len(sys.argv) != 4):
-        print("usage modBegin modEnd destination")
-    else:
-        print("performing script with args:")
-        print(sys.argv)
-        modBegin = int(sys.argv[1], 16)
-        modEnd = int(sys.argv[2], 16)
-        destination = int(sys.argv[3], 16)        
-        main()
+    parseArgFile()
+    print(sys.argv)
+    args = parser.parse_args()
+
+    print("performing script")
+    main(args)
