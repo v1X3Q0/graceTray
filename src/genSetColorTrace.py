@@ -9,7 +9,7 @@ parser.add_argument('-if', dest='inputFile', help='input file with trace',
                         required=True)
 
 whiteColor = 0xffffffff
-startColor = 0xffffff
+startColor = 0x00ffffff
 endColor = 0x00000000
 
 def curColorInc(k):
