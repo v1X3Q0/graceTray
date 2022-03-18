@@ -14,6 +14,8 @@ parser.add_argument('inputFile',
     help='input file with trace')
 parser.add_argument('-sc', '--startColor', required=False, type=hex_int,
     help='start color to use')
+parser.add_argument('-ec', '--endColor', required=False, type=hex_int,
+    help='end color to use')
 
 whiteColor = 0xffffffff
 startColor = 0x00ffffff
@@ -50,6 +52,7 @@ def bumask(color):
 
 def main():
     global startColor
+    global endColor
 
     args = parser.parse_args()    
     if args.inputFile[-4:] != '.txt':
@@ -74,6 +77,8 @@ def main():
 
     if args.startColor != None:
         startColor = args.startColor
+    if args.endColor != None:
+        endColor = args.endColor
 
     # determine step for changing the color
     rstart = rmask(startColor)
