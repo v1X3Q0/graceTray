@@ -102,7 +102,7 @@ def main(args):
         ARCH="i386:x86-64"
         ARCH_SIZE=8
         size_t = uint64_t
-    elif "armv5t" in arch_res:
+    elif ("armv5t" in arch_res) or ("arm)" in arch_res):
         ARCH="arm32"
         ARCH_SIZE=4
         size_t = uint32_t
@@ -127,12 +127,10 @@ def main(args):
     
 if __name__ == "__main__":
 # def sysmain():
-    gdb.write("in sys")
     parseArgFile()
     # print(sys.argv)
     args = parser.parse_args()
 
-    print("performing script")
     main(args)
 
 # sysmain()
