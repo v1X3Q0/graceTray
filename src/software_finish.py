@@ -12,7 +12,7 @@ if "i386:x86-64" in arch_res:
     ARCH="i386:x86-64"
     ARCH_SIZE=8
     size_t = uint64_t
-elif "armv5t" in arch_res:
+elif ("armv5t" in arch_res) or ("arm)" in arch_res):
     ARCH="arm32"
     ARCH_SIZE=4
     size_t = uint32_t
@@ -48,6 +48,8 @@ def software_finish():
         stack_temp = int(gdb.parse_and_eval("$sp").cast(size_t))
         pc_save = int(gdb.parse_and_eval(hex(stack_temp)))
     # print("pc_save {}".format(pc_save))
-    software_finishpoint("*{}".format(hex(pc_save)))
+    temp_finish = software_finishpoint("*{}".format(hex(pc_save)))
+    temp_finish.silent = True
     gdb.execute("c")
+    temp_finish.delete()
 

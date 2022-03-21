@@ -1,6 +1,8 @@
-from inspect import stack
+from inspect import stack, trace
 import sys
 import argparse
+from datetime import datetime
+import os
 
 from numpy import size
 # from software_finish import software_finish, software_finishpoint
@@ -83,8 +85,28 @@ def software_finish():
         stack_temp = int(gdb.parse_and_eval("$sp").cast(size_t))
         pc_save = int(gdb.parse_and_eval(hex(stack_temp)))
     # print("pc_save {}".format(pc_save))
-    software_finishpoint("*{}".format(hex(pc_save)))
+    temp_finish = software_finishpoint("*{}".format(hex(pc_save)))
+    temp_finish.silent = True
     gdb.execute("c")
+    temp_finish.delete()
+
+def init_trace_filename():
+    fname = ""
+    fileres = gdb.execute("info files", to_string=True)
+    symbolline = fileres.split('\n')[0]
+    if symbolline.split(' ')[0] == "Symbols":
+        fileabs_beg = symbolline.find("\"")
+        fileabs_end = symbolline.find("\"", fileabs_beg + 1)
+        fileabs = symbolline[fileabs_beg + 1:fileabs_end]
+        fname = "{}_".format(os.path.basename(fileabs))
+
+    tracename = "{}{}_{}.trace.txt".format(fname,
+        hex(int(gdb.parse_and_eval("$pc").cast(size_t))),
+        datetime.utcnow().strftime('%Y%m%d_%H%M%S%f')[:-3])
+        
+    return tracename
+    # return "gdbTrace.txt"
+
 
 def main(args):
     global ARCH
@@ -110,7 +132,7 @@ def main(args):
         print("unknown architecture res: {}".format(arch_res))
         return False
     if args.noTrace != True:
-        f = open("gdbTrace.txt", "w")
+        f = open(init_trace_filename(), "w")
     while True:
         currentInst = gdb.parse_and_eval("$pc")
         if (currentInst < args.funcBegin) or (currentInst > args.funcEnd):
