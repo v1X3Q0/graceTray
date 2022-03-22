@@ -65,9 +65,9 @@ def init_trace_py(inputFile):
     # remove directory path
     inputFile = os.path.basename(inputFile)
     # remove .txt
-    inputFile = os.path.splitext(inputFile)
+    inputFile = os.path.splitext(inputFile)[0]
     # remove .trace
-    inputFile = os.path.splitext(inputFile)
+    inputFile = os.path.splitext(inputFile)[0]
 
     # a date can be _20220318_221418515, length 19
     datesuffix = inputFile[-19:]
@@ -78,7 +78,7 @@ def init_trace_py(inputFile):
     # modificationTime = time.strftime('%Y%m%d_%H%M%S', time.localtime(modTimesinceEpoc))
 
     fullNewPath = os.path.join(inputFileDir,
-        "inputFile{}".format('.trace.py'))
+        "{}{}".format(inputFile, '.trace.py'))
     f = open(fullNewPath, 'w')
     return f, inputFile
 
