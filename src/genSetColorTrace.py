@@ -80,6 +80,7 @@ def init_trace_py(inputFile):
     fullNewPath = os.path.join(inputFileDir,
         "{}{}".format(inputFile, '.trace.py'))
     f = open(fullNewPath, 'w')
+    print("outfile will be {}".format(fullNewPath))
     return f, inputFile
 
 

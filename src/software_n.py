@@ -38,6 +38,25 @@ def software_finish():
     gdb.execute("c")
     temp_finish.delete()
 
+def eval_branch_taken():
+    result = False
+    sp_pre_step = gdb.parse_and_eval("$sp").cast(size_t)
+    pc_pre_step = gdb.parse_and_eval("$pc").cast(size_t)
+    lr_pre_step = gdb.parse_and_eval("$lr").cast(size_t)
+    gdb.execute("si")
+    sp_post_step = gdb.parse_and_eval("$sp").cast(size_t)
+    pc_post_step = gdb.parse_and_eval("$pc").cast(size_t)
+    lr_post_step = gdb.parse_and_eval("$lr").cast(size_t)
+    # condition is that our stack has decremented and we have
+
+    # condition one, by arm32 convention bl ADDR_IMM
+    if (lr_pre_step != lr_post_step) and (pc_post_step != (pc_pre_step + 4)) and ((pc_pre_step + 4) == lr_post_step):
+        result = True
+    # condition 2, mov lr, pc; bx ADDR_IMM
+    elif (pc_post_step != pc_pre_step + 4) and ((pc_pre_step + 4) == lr_post_step):
+        result = True
+    return result
+
 def invoke_software_finish(arg, from_tty):
     global ARCH
     global ARCH_SIZE
@@ -57,14 +76,16 @@ def invoke_software_finish(arg, from_tty):
     else:
         print("unknown architecture res: {}".format(arch_res))
         return False
-    software_finish()
+    # condition is that our stack has decremented and we have 
+    if eval_branch_taken() == True:
+        software_finish()
 
-class sfc (gdb.Command):
-    """software finish command"""
+class sso (gdb.Command):
+    """software step over"""
     def __init__(self):
-        super(sfc, self).__init__("sfc", gdb.COMMAND_USER)
+        super(sso, self).__init__("sso", gdb.COMMAND_USER)
 
     def invoke(self, arg, from_tty):
         invoke_software_finish(arg, from_tty)
 
-sfc()
+sso()
