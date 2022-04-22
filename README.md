@@ -1,5 +1,5 @@
 # graceTray
-small tool for coloring disassembled instructions in ida for coverage on target methods.
+small tool for coloring disassembled instructions in ida or binary ninja for coverage on target methods.
 
 To start, this tool requires you to first determine which routine that it is you want to measure where the code is going to go.
 
@@ -48,17 +48,7 @@ Mapped address spaces:
       0x555555754000     0x555555755000     0x1000        0x0 /home/mariomain/Documents/file.x
       0x555555755000     0x555555756000     0x1000     0x1000 /home/mariomain/Documents/file.x
       0x7ffff79e4000     0x7ffff7bcb000   0x1e7000        0x0 /lib/x86_64-linux-gnu/libc-2.27.so
-      0x7ffff7bcb000     0x7ffff7dcb000   0x200000   0x1e7000 /lib/x86_64-linux-gnu/libc-2.27.so
-      0x7ffff7dcb000     0x7ffff7dcf000     0x4000   0x1e7000 /lib/x86_64-linux-gnu/libc-2.27.so
-      0x7ffff7dcf000     0x7ffff7dd1000     0x2000   0x1eb000 /lib/x86_64-linux-gnu/libc-2.27.so
-      0x7ffff7dd1000     0x7ffff7dd5000     0x4000        0x0 
-      0x7ffff7dd5000     0x7ffff7dfc000    0x27000        0x0 /lib/x86_64-linux-gnu/ld-2.27.so
-      0x7ffff7fd9000     0x7ffff7fdb000     0x2000        0x0 
-      0x7ffff7ff8000     0x7ffff7ffb000     0x3000        0x0 [vvar]
-      0x7ffff7ffb000     0x7ffff7ffc000     0x1000        0x0 [vdso]
-      0x7ffff7ffc000     0x7ffff7ffd000     0x1000    0x27000 /lib/x86_64-linux-gnu/ld-2.27.so
-      0x7ffff7ffd000     0x7ffff7ffe000     0x1000    0x28000 /lib/x86_64-linux-gnu/ld-2.27.so
-      0x7ffff7ffe000     0x7ffff7fff000     0x1000        0x0 
+    ...
       0x7ffffffde000     0x7ffffffff000    0x21000        0x0 [stack]
   0xffffffffff600000 0xffffffffff601000     0x1000        0x0 [vsyscall]
 ```
