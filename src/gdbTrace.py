@@ -10,23 +10,6 @@ from numpy import size
 def hex_int(x):
     return int(x, 16)
 
-parser = argparse.ArgumentParser(description='trace some stuff.')
-parser.add_argument('-mb', '--modBegin', type=hex_int,
-                    help='module beginning')
-parser.add_argument('-me', '--modEnd', type=hex_int,
-                    help='module ending')
-parser.add_argument('-fb', '--funcBegin', type=hex_int,
-                    help='function beginning')
-parser.add_argument('-fe', '--funcEnd', type=hex_int,
-                    help='function ending')
-parser.add_argument('destination', type=hex_int,
-                    help='destination instruction')
-parser.add_argument('-nt', '--noTrace', action='store_true',
-                    help='whether or not to record instructions')
-parser.add_argument('-mt', '--multTrace', action='store_true',
-                    help='trace point infinite times, or auto cleanup')
-
-
 ARCH=None
 ARCH_SIZE=None
 uint64_t = gdb.lookup_type('unsigned long long')
@@ -178,6 +161,22 @@ def invoke_software_tracepoint(arg, from_tty):
     global size_t
     global IS_TRACING
     f = None
+    parser = argparse.ArgumentParser(description='trace some stuff.')
+    parser.add_argument('-mb', '--modBegin', type=hex_int,
+                        help='module beginning')
+    parser.add_argument('-me', '--modEnd', type=hex_int,
+                        help='module ending')
+    parser.add_argument('-fb', '--funcBegin', type=hex_int,
+                        help='function beginning')
+    parser.add_argument('-fe', '--funcEnd', type=hex_int,
+                        help='function ending')
+    parser.add_argument('destination', type=hex_int,
+                        help='destination instruction')
+    parser.add_argument('-nt', '--noTrace', action='store_true',
+                        help='whether or not to record instructions')
+    parser.add_argument('-mt', '--multTrace', action='store_true',
+                        help='trace point infinite times, or auto cleanup')
+
     # i386:x86-64
     # The target architecture is set automatically (currently i386:x86-64)
     # armv5t

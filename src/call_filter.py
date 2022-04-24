@@ -4,20 +4,10 @@ import os
 import time
 
 # example usage
-# cf recv "license" "$rsi" "rdi"
+# cfs recv "license" "$rsi" "rdi"
 
 def hex_int(x):
     return int(x, 16)
-
-parser = argparse.ArgumentParser(description='trace some stuff.')
-parser.add_argument('sym_address',
-                    help='symbol or address to break at')
-parser.add_argument('search_string',
-                    help='string to compare the argument of')
-parser.add_argument('bytes_search',
-                    help='bytes address to begin the search for')
-parser.add_argument('bytes_length',
-                    help='length to use for search of bytes')
 
 ARCH=None
 ARCH_SIZE=None
@@ -26,6 +16,7 @@ uint32_t = gdb.lookup_type('unsigned int')
 uint16_t = gdb.lookup_type('unsigned short')
 uint8_t = gdb.lookup_type('unsigned char')
 size_t = None
+nostop = False
 
 # convert args in args.txt to sys.argv, expect 1 line in
 def parseArg(args_line):
@@ -52,10 +43,11 @@ class call_filter (gdb.Breakpoint):
         self.bytes_length = bytes_length
         gdb.Breakpoint.__init__(self, spec)
     def stop (self):
+        global nostop
         cur_bs = hex(int(gdb.parse_and_eval(self.bytes_search).cast(size_t)))
         cur_bl = hex(int(gdb.parse_and_eval(self.bytes_length).cast(size_t)))
         target_find_str = "find {}, +{}, {}".format(cur_bs, cur_bl, self.search_string)
-        print(target_find_str)
+        # print(target_find_str)
         if int(cur_bl, 16) < len(self.search_string):
             # print("too small a size, continuing")
             return False
@@ -63,14 +55,30 @@ class call_filter (gdb.Breakpoint):
         if "Pattern not found." in find_output:
             # print(find_output)
             return False
+        print(find_output)
+        # no stop == true means no stop
+        if nostop == True:
+            return False
         return True
+        
         
 def invoke_call_filter(arg, from_tty):
     global ARCH
     global ARCH_SIZE
     global size_t
-    global IS_TRACING
-    f = None
+    global nostop
+
+    parser = argparse.ArgumentParser(description='trace some stuff.')
+    parser.add_argument('sym_address',
+                        help='symbol or address to break at')
+    parser.add_argument('search_string',
+                        help='string to compare the argument of')
+    parser.add_argument('bytes_search',
+                        help='bytes address to begin the search for')
+    parser.add_argument('bytes_length',
+                        help='length to use for search of bytes')
+    parser.add_argument('-ns', action='store_true',
+                        help='don\'t stop')
 
     arch_res = gdb.execute("show architecture", to_string=True)
     if "i386:x86-64" in arch_res:
@@ -86,6 +94,8 @@ def invoke_call_filter(arg, from_tty):
         return False
     parseArg(arg)
     args = parser.parse_args()
+    if args.ns != None:
+        nostop = True
     bytes_search = args.bytes_search.replace("\"", "")
     bytes_length = args.bytes_length.replace("\"", "")
     call_filter(args.sym_address, args.search_string, bytes_search, bytes_length)
