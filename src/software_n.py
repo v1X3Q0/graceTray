@@ -5,12 +5,40 @@ import time
 
 ARCH=None
 ARCH_SIZE=None
-uint64_t = gdb.lookup_type('unsigned long long')
-uint32_t = gdb.lookup_type('unsigned int')
-uint16_t = gdb.lookup_type('unsigned short')
-uint8_t = gdb.lookup_type('unsigned char')
+uint64_n = "unsigned long long"
+uint32_n = "unsigned int"
+uint16_n = "unsigned short"
+uint8_n = "unsigned char"
+uint64_t = gdb.lookup_type(uint64_n)
+uint32_t = gdb.lookup_type(uint32_n)
+uint16_t = gdb.lookup_type(uint16_n)
+uint8_t = gdb.lookup_type(uint8_n)
+size_n = None
 size_t = None
 IS_TRACING=False
+
+def get_next_instruction():
+    if ARCH == "i386:x86-64":
+        pc_output = gdb.execute("x/2i $pc", to_string=True)
+        next_inst = pc_output.split('\n')[1]
+        next_inst = next_inst.replace("\t", " ")
+        next_inst = next_inst.replace(":", "")
+        next_inst = next_inst[3:]
+        next_inst = next_inst.split(" ")[0]
+        next_inst_addr = int(next_inst, 16)
+    elif ARCH == "arm32":
+        cur_inst = int(gdb.parse_and_eval("$pc").cast(size_t))
+        next_inst_addr = cur_inst + 4
+    return next_inst_addr
+
+def get_ret_address():
+    if ARCH == "i386:x86-64":
+        # print(hex(int(gdb.parse_and_eval("*(unsigned long long*)" + sp_temp).cast(gdb.lookup_type('unsigned long long')))))
+        sp_temp = int(gdb.parse_and_eval("$sp").cast(size_t))
+        ret_addr = int(gdb.parse_and_eval("*({}*){}".format(size_n, hex(sp_temp))).cast(size_t))
+    elif ARCH == "arm32":
+        ret_addr = int(gdb.parse_and_eval("$lr").cast(size_t))
+    return ret_addr
 
 class software_finishpoint (gdb.Breakpoint):
     def __init__(self, spec):
@@ -25,14 +53,7 @@ class software_finishpoint (gdb.Breakpoint):
         return False
 
 def software_finish():
-    pc_save = None
-    if ARCH == "arm32":
-        pc_save = int(gdb.parse_and_eval("$lr").cast(size_t))
-    elif ARCH == "arm64":
-        pc_save = int(gdb.parse_and_eval("$x30").cast(size_t))
-    elif ARCH == "i386:x86-64":
-        stack_temp = int(gdb.parse_and_eval("$sp").cast(size_t))
-        pc_save = int(gdb.parse_and_eval(hex(stack_temp)))
+    pc_save = get_ret_address()
     temp_finish = software_finishpoint("*{}".format(hex(pc_save)))
     temp_finish.silent = True
     gdb.execute("c")
@@ -40,26 +61,32 @@ def software_finish():
 
 def eval_branch_taken():
     result = False
-    sp_pre_step = gdb.parse_and_eval("$sp").cast(size_t)
-    pc_pre_step = gdb.parse_and_eval("$pc").cast(size_t)
-    lr_pre_step = gdb.parse_and_eval("$lr").cast(size_t)
+    sp_pre_step = int(gdb.parse_and_eval("$sp").cast(size_t))
+    pc_pre_step = int(gdb.parse_and_eval("$pc").cast(size_t))
+    lr_pre_step = get_ret_address()
+    pc_post_step_pred = get_next_instruction()
     gdb.execute("si")
-    sp_post_step = gdb.parse_and_eval("$sp").cast(size_t)
-    pc_post_step = gdb.parse_and_eval("$pc").cast(size_t)
-    lr_post_step = gdb.parse_and_eval("$lr").cast(size_t)
+    sp_post_step = int(gdb.parse_and_eval("$sp").cast(size_t))
+    pc_post_step = int(gdb.parse_and_eval("$pc").cast(size_t))
+    lr_post_step = get_ret_address()
     # condition is that our stack has decremented and we have
 
-    # condition one, by arm32 convention bl ADDR_IMM
-    if (lr_pre_step != lr_post_step) and (pc_post_step != (pc_pre_step + 4)) and ((pc_pre_step + 4) == lr_post_step):
-        result = True
-    # condition 2, mov lr, pc; bx ADDR_IMM
-    elif (pc_post_step != pc_pre_step + 4) and ((pc_pre_step + 4) == lr_post_step):
-        result = True
+    if ARCH == "arm32":
+        # condition one, by arm32 convention bl ADDR_IMM
+        if (lr_pre_step != lr_post_step) and (pc_post_step != pc_post_step_pred) and (pc_post_step_pred == lr_post_step):
+            result = True
+        # condition 2, mov lr, pc; bx ADDR_IMM
+        elif (pc_post_step != pc_post_step_pred) and (pc_post_step_pred == lr_post_step):
+            result = True
+    elif ARCH == "i386:x86-64":
+        if (sp_pre_step > sp_post_step) and (pc_post_step != pc_post_step_pred) and (pc_post_step_pred == lr_post_step):
+            result = True
     return result
 
 def invoke_software_finish(arg, from_tty):
     global ARCH
     global ARCH_SIZE
+    global size_n
     global size_t
     global IS_TRACING
     f = None
@@ -68,10 +95,12 @@ def invoke_software_finish(arg, from_tty):
     if "i386:x86-64" in arch_res:
         ARCH="i386:x86-64"
         ARCH_SIZE=8
+        size_n = uint64_n
         size_t = uint64_t
     elif ("armv5t" in arch_res) or ("arm)" in arch_res):
         ARCH="arm32"
         ARCH_SIZE=4
+        size_n = uint32_n
         size_t = uint32_t
     else:
         print("unknown architecture res: {}".format(arch_res))
