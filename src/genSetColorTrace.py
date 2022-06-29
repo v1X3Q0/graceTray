@@ -5,6 +5,10 @@ import time
 def hex_int(x):
     return int(x, 16)
 
+whiteColor = 0xffffffff
+startColor = 0x00ffffff
+endColor = 0x00000000
+
 parser = argparse.ArgumentParser(description='create set color script for ida')
 parser.add_argument('-fb', '--funcBegin', required=False, type=hex_int,
     help='start of target routine')
@@ -14,16 +18,14 @@ parser.add_argument('-df', '--disassemblerFormat', default="ida",
     help='disassembler format, ida or binja')
 parser.add_argument('inputFile',
     help='input file with trace')
-parser.add_argument('-sc', '--startColor', required=False, type=hex_int,
-    help='start color to use')
-parser.add_argument('-ec', '--endColor', required=False, type=hex_int,
-    help='end color to use')
+parser.add_argument('-sc', '--startColor', default=startColor, type=hex_int,
+    help='start color to use, default 0x{}'.format(hex(startColor)[2:].zfill(8)))
+parser.add_argument('-ec', '--endColor', default=endColor, type=hex_int,
+    help='end color to use, default 0x{}'.format(hex(endColor)[2:].zfill(8)))
 parser.add_argument('-rc', "--resetColor", required=False, action="store_true",
     help='reset color with input scheme')
-
-whiteColor = 0xffffffff
-startColor = 0x00ffffff
-endColor = 0x00000000
+parser.add_argument('-rb', '--rebase', type=hex_int, default=0,
+    help='optionally rebase an input file, default=0, so no rebase')
 
 hfName = "highlightFunc"
 
@@ -98,13 +100,13 @@ def main():
     f = open(args.inputFile, 'r')
     g = f.readlines()
     f.close()
-
+    rebase = args.rebase
     f, modunit = init_trace_py(args.inputFile)
 
     traceList = []
     for i in g:
         i = i.replace('\n', '')
-        i = int(i, 16)
+        i = int(i, 16) - rebase
         if ((args.funcBegin != None) and (i >= args.funcBegin and i <= args.funcEnd)) or (args.funcBegin == None):
             if i not in traceList:
                 traceList.append(i)
