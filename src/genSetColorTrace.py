@@ -14,7 +14,7 @@ parser.add_argument('-fb', '--funcBegin', required=False, type=hex_int,
     help='start of target routine')
 parser.add_argument('-fe', '--funcEnd', required=False, type=hex_int,
     help='End of target routine')
-parser.add_argument('-df', '--disassemblerFormat', default="ida",
+parser.add_argument('-df', '--disassemblerFormat', default="binja",
     help='disassembler format, ida or binja')
 parser.add_argument('inputFile',
     help='input file with trace')
@@ -136,6 +136,7 @@ def main():
     print("decrements are r:{}, g:{}, b:{}".format(rstep, gstep, bstep))
 
     target_identifier = "{}_{}".format(hex(traceList[0]), modunit)
+    target_identifier = target_identifier.replace('-', '_')
 
     f.write("def set_{}():\n".format(target_identifier))
     if args.disassemblerFormat == "binja":
@@ -146,7 +147,7 @@ def main():
         #     curColor = 0
         
         if args.disassemblerFormat == "ida":
-            f.write('set_color({}, CIC_ITEM, {})\n'.format(hex(i),
+            f.write('\tset_color({}, CIC_ITEM, {})\n'.format(hex(i),
                 hex(rumask(int(rcur)) + gumask(int(gcur)) + bumask(int(bcur)))))
         elif args.disassemblerFormat == "binja":
             f.write("\t{}.set_auto_instr_highlight({}, HighlightColor(red={}, green={}, blue={}))\n".format(

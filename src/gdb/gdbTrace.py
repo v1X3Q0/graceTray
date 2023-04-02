@@ -22,6 +22,7 @@ def hex_int(x):
 def init_trace_filename():
     size_t = getsize_t()
     fname = ""
+    # detect if you have a symbol file, if so name will use its name
     fileres = gdb.execute("info files", to_string=True)
     symbolline = fileres.split('\n')[0]
     if symbolline.split(' ')[0] == "Symbols":
