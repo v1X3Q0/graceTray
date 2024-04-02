@@ -4,6 +4,10 @@ import os
 import time
 import re
 import gdb
+import sys
+
+dirname, filename = os.path.split(os.path.abspath(__file__))
+sys.path.append(dirname)
 
 from gdb_stools import clear_ws
 from gdb_stools import populate_libs

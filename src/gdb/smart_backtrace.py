@@ -5,6 +5,10 @@ import time
 import re
 import gdb
 
+dirname, filename = os.path.split(os.path.abspath(__file__))
+if dirname not in sys.path:
+    sys.path.append(dirname)
+
 from gdb_stools import populate_libs
 from gdb_stools import clear_ws
 from gdb_stools import architecture_init

@@ -5,6 +5,10 @@ import time
 import re
 import gdb
 
+dirname, filename = os.path.split(os.path.abspath(__file__))
+if dirname not in sys.path:
+    sys.path.append(dirname)
+
 from gdb_stools import parseArg
 from gdb_stools import populate_libs
 from gdb_stools import getlibranges_map

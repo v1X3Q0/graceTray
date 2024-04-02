@@ -4,6 +4,10 @@ import os
 import time
 import gdb
 
+dirname, filename = os.path.split(os.path.abspath(__file__))
+if dirname not in sys.path:
+    sys.path.append(dirname)
+
 from gdb_stools import architecture_init
 from gdb_stools import get_ret_address
 from gdb_stools import getARCH
