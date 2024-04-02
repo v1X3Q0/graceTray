@@ -69,7 +69,7 @@ def get_next_instruction():
         next_inst = next_inst[3:]
         next_inst = next_inst.split(" ")[0]
         next_inst_addr = int(next_inst, 16)
-    elif ARCH == "arm32":
+    elif (ARCH == "arm32") or (ARCH == "aarch64"):
         cur_inst = int(gdb.parse_and_eval("$pc").cast(size_t))
         next_inst_addr = cur_inst + 4
     return next_inst_addr
@@ -79,7 +79,7 @@ def get_ret_address():
         # print(hex(int(gdb.parse_and_eval("*(unsigned long long*)" + sp_temp).cast(gdb.lookup_type('unsigned long long')))))
         sp_temp = int(gdb.parse_and_eval("$sp").cast(size_t))
         ret_addr = int(gdb.parse_and_eval("*({}*){}".format(size_n, hex(sp_temp))).cast(size_t))
-    elif ARCH == "arm32":
+    elif (ARCH == "arm32") or (ARCH == "aarch64"):
         ret_addr = int(gdb.parse_and_eval("$lr").cast(size_t))
     return ret_addr
 
@@ -95,7 +95,7 @@ def eval_branch_taken():
     lr_post_step = get_ret_address()
     # condition is that our stack has decremented and we have
 
-    if ARCH == "arm32":
+    if (ARCH == "arm32") or (ARCH == "aarch64"):
         # condition one, by arm32 convention bl ADDR_IMM
         if (lr_pre_step != lr_post_step) and (pc_post_step != pc_post_step_pred) and (pc_post_step_pred == lr_post_step):
             result = True
@@ -207,6 +207,11 @@ def architecture_init():
         ARCH_SIZE=4
         size_t = uint32_t
         size_n = "unsigned int"
+    elif 'aarch64' in arch_res:
+        ARCH="aarch64"
+        ARCH_SIZE=8
+        size_t = uint64_t
+        size_n = "unsigned long long"
     else:
         print("unknown architecture res: {}".format(arch_res))
         return False

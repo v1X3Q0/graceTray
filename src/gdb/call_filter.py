@@ -85,6 +85,10 @@ def invoke_call_filter(arg, from_tty):
         ARCH="arm32"
         ARCH_SIZE=4
         size_t = uint32_t
+    elif 'aarch64' in arch_res:
+        ARCH="aarch64"
+        ARCH_SIZE=8
+        size_t = uint64_t
     else:
         print("unknown architecture res: {}".format(arch_res))
         return False
