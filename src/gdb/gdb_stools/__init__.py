@@ -202,7 +202,7 @@ def architecture_init():
         ARCH_SIZE=8
         size_t = uint64_t
         size_n = "unsigned long long"
-    elif ("armv5t" in arch_res) or ("arm)" in arch_res):
+    elif ("armv5t" in arch_res) or ("arm" in arch_res):
         ARCH="arm32"
         ARCH_SIZE=4
         size_t = uint32_t

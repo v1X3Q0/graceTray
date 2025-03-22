@@ -37,7 +37,7 @@ def init_trace_filename():
 
     tracename = "{}{}_{}.trace.txt".format(fname,
         hex(int(gdb.parse_and_eval("$pc").cast(size_t))),
-        datetime.utcnow().strftime('%Y%m%d_%H%M%S%f')[:-3])
+        datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3])
 
     return tracename
     # return "gdbTrace.txt"
