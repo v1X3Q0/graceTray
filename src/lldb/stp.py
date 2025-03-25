@@ -19,7 +19,7 @@ def init_trace_filename():
 
     tracename = "{}{}_{}.trace.txt".format(fname,
         hex(target.GetProcess().selected_thread.frame[0].pc),
-        datetime.utcnow().strftime('%Y%m%d_%H%M%S%f')[:-3])
+        datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3])
 
     return tracename
     # return "gdbTrace.txt"

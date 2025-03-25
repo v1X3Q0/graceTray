@@ -55,19 +55,6 @@ def gumask(color):
 def bumask(color):
     return (color & 0xff) << 0x00
 
-RSHIFT_CONST = 0x10
-GSHIFT_CONST = 0x08
-BSHIFT_CONST = 0x00
-
-def mask_step_cur(startcolor: int, endcolor: int, tracecount: int, shift_const: int):
-    targ_mask = (0xff << shift_const)
-    cstart = (startcolor & targ_mask) >> shift_const
-    cend = (endcolor & targ_mask) >> shift_const
-    cstep = (cstart - cend) * 1.0 / tracecount
-    ccur = cstart * 1.0
-
-    return cstep, ccur
-
 resetCodeBlock = """
 def reset_color(targAddr={}):
     highlightFunc = bv.get_functions_containing(targAddr)[0]
