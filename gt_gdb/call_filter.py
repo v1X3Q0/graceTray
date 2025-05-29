@@ -2,6 +2,8 @@
 import argparse
 import os
 import time
+import gdb
+import sys
 
 # example usage
 # cfs recv "license" "$rsi" "rdi"
@@ -109,5 +111,3 @@ class cfs (gdb.Command):
 
     def invoke(self, arg, from_tty):
         invoke_call_filter(arg, from_tty)
-
-cfs()

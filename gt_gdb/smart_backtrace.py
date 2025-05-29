@@ -4,6 +4,7 @@ import os
 import time
 import re
 import gdb
+import sys
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
 if dirname not in sys.path:
@@ -71,5 +72,3 @@ class lta (gdb.Command):
         if pot_libname != None:
             print("from {} offset {}".format(pot_libname, hex(targ_addr - libranges_map[pot_libname][0]["start_addr"])))
 
-sbt()
-lta()

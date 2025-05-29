@@ -7,10 +7,11 @@ def brute_gracetray(bv: BinaryView, endAddr: int, startColor: int, endColor: int
         fname = ""
         # detect if you have a symbol file, if so name will use its name
         fileabs = bv.file.original_filename
-        fname = "{}_".format(os.path.dirname(fileabs))
-        tracename = "{}{}_{}.trace.txt".format(fname,
+        fname = "{}_".format(os.path.basename(fileabs))
+        tracename = "{}{}_{}.trace.py".format(fname,
             hex(startAddr),
             datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3])
+        tracename = os.path.join(os.path.dirname(fileabs), tracename)
         return tracename
     def mask_step_cur(startcolor: int, endcolor: int, tracecount: int, shift_const: int):
         targ_mask = (0xff << shift_const)

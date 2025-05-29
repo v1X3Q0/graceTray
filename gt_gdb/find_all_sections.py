@@ -39,4 +39,3 @@ class fas (gdb.Command):
     def invoke(self, arg, from_tty):
         invoke_find_all_sections(arg, from_tty)
 
-fas()

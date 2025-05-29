@@ -3,6 +3,7 @@ import argparse
 import os
 import time
 import gdb
+import sys
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
 if dirname not in sys.path:
@@ -27,5 +28,3 @@ class sfc (gdb.Command):
 
     def invoke(self, arg, from_tty):
         invoke_software_finish(arg, from_tty)
-
-sfc()
