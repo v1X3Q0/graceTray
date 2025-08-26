@@ -1,4 +1,9 @@
 # COPY VARIANT
+import os
+from datetime import datetime
+from binaryninja import BinaryView, Function
+from binaryninja.debugger import debugger
+from binaryninja.highlight import HighlightColor
 def brute_gracetray(bv: BinaryView, endAddr: int, startColor: int, endColor: int, fdeb=None, fname=None):
     RSHIFT_CONST = 0x10
     GSHIFT_CONST = 0x08
@@ -26,7 +31,7 @@ def brute_gracetray(bv: BinaryView, endAddr: int, startColor: int, endColor: int
             inst_count+=1
         return inst_count
     if fdeb == None:
-        fdeb = binaryninja.debugger.DebuggerController(bv)
+        fdeb = debugger.DebuggerController(bv)
     if fname == '':
         fname = init_trace_filename(bv, fdeb.ip)
     insthighlight_list = []
